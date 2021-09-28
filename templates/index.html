@@ -24,7 +24,11 @@
         <form action="/" method="POST">
             {% for item in items %}
             <!--add checked if needed-->
-            <input type="checkbox" id="{{ item }}" name="{{ item }}" value="{{ item }}">
+            <input type="checkbox" id="{{ item }}" name="{{ item }}" value="{{ item }}"
+                {% if item in checked %}
+                checked
+                {% endif %}
+            >
             <label for="{{ item }}">{{ item }}</label><br>
             {% endfor %}
             <br><br>

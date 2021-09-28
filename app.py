@@ -14,11 +14,12 @@ database = db.db()
 def index():
     listOfItems = database.getDistinct()
     items = []
+    checked = []
     for item in listOfItems:
       items.append(item[0])
     #tests()
     if request.method == "GET":
-        return render_template("index.html", len = len(items), items = items)
+        return render_template("index.html", checked = checked, items = items)
     if request.method == "POST":
         form_data = request.form
         if form_data == "1h":
@@ -30,10 +31,12 @@ def index():
         elif form_data == "8h":
           pass
         else:
-          pass
+          for i in form_data.values():
+            checked.append(i)
         #form_data = database.get_distinct()
         print(form_data)
-        return render_template("index.html", len = len(items), items = items)
+        print(checked)
+        return render_template("index.html", checked = checked, items = items)
 
 @app.route("/api", methods = ["POST", "GET"])
 def api():
@@ -49,7 +52,6 @@ def getData(timescale, items):
   dataset = {}
   startTime = datetime.datetime.now() - datetime.timedelta(0,0,0,0,0,timescale,0)
   endTime = datetime.datetime.now()
-  #items = database.get_item(startTime, datetime.datetime.now(), PlaceHolder)
   for item in items:
     dataset[item] = database.getItem(startTime, endTime, item)
   print(dataset)
