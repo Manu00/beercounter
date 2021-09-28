@@ -17,6 +17,24 @@
     <div>
         <canvas id="myChart"></canvas>
     </div>
+    <div id="chart-control">
+        <form action="/" method="POST">
+            <input type="submit" value="1h" name="1h" />
+            <input type="submit" value="2h" name="2h" />
+            <input type="submit" value="4h" name="4h" />
+            <input type="submit" value="8h" name="8h" />
+        </form>
+        <form>
+            <label for="items">Choose an item:</label>
+            <select name="items" id="items">
+                {% for i in range(0, len) %}
+                <option value="{{ clean }}">{{ items[i] }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
 </body>
 <script>
     var xValues = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150];
