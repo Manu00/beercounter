@@ -25,12 +25,10 @@
             <input type="submit" value="8h" name="8h" />
         </form>
         <form>
-            <label for="items">Choose an item:</label>
-            <select name="items" id="items">
-                {% for i in range(0, len) %}
-                <option value="{{ clean }}">{{ items[i] }}</option>
-                {% endfor %}
-            </select>
+            {% for item in items %}
+            <input type="checkbox" id="{{ item }}" name="{{ item }}" value="{{ item }}">
+            <label for="{{ item }}">{{ item }}</label><br>
+            {% endfor %}
             <br><br>
             <input type="submit" value="Submit">
         </form>

@@ -48,9 +48,3 @@ class db:
         
 connection = sqlite3.connect("beercounter.db", check_same_thread=False)
 cursor = connection.cursor()
-sql = "CREATE TABLE items(" \
-                "time TEXT, " \
-                "name TEXT, " \
-                "id TEXT PRIMARY KEY)"
-cursor.execute(sql)
-connection.commit()

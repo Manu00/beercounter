@@ -12,8 +12,10 @@ database = db.db()
 
 @app.route("/", methods = ["POST", "GET"])
 def index():
-    items = database.get_distinct()
-    print(items[0])
+    listOfItems = database.get_distinct()
+    items = list
+    for item in listOfItems:
+      items.append(item[0])
     if request.method == "GET":
         return render_template("index.html", len = len(items), items = items)
     if request.method == "POST":
