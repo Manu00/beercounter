@@ -13,7 +13,7 @@ database = db.db()
 @app.route("/", methods = ["POST", "GET"])
 def index():
     listOfItems = database.get_distinct()
-    items = list
+    items = []
     for item in listOfItems:
       items.append(item[0])
     if request.method == "GET":
