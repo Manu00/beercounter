@@ -1,4 +1,4 @@
-from logging import shutdown
+from logging import PlaceHolder, shutdown
 from flask import Flask, redirect, url_for, request, render_template
 import datetime, os, sys, uuid
 import db
@@ -12,10 +12,11 @@ database = db.db()
 
 @app.route("/", methods = ["POST", "GET"])
 def index():
-    listOfItems = database.get_distinct()
+    listOfItems = database.getDistinct()
     items = []
     for item in listOfItems:
       items.append(item[0])
+    #tests()
     if request.method == "GET":
         return render_template("index.html", len = len(items), items = items)
     if request.method == "POST":
@@ -38,12 +39,24 @@ def index():
 def api():
     if request.method == "POST":
       item = request.json.get("name")
-      database.store_item(datetime.datetime.now(), item, uuid.uuid4())
+      database.storeItem(datetime.datetime.now(), item, uuid.uuid4())
       print(item)
       return "ok"
     else:
       return "ok"
 
+def getData(timescale, items):
+  dataset = {}
+  startTime = datetime.datetime.now() - datetime.timedelta(0,0,0,0,0,timescale,0)
+  endTime = datetime.datetime.now()
+  #items = database.get_item(startTime, datetime.datetime.now(), PlaceHolder)
+  for item in items:
+    dataset[item] = database.getItem(startTime, endTime, item)
+  print(dataset)
+  return dataset
+
 def tests():
-    database.store_item(datetime.time, "Bier", 1)
-    database.get_item()
+    #database.storeItem(datetime.time, "Bier", 1)
+    database.getItem(datetime.datetime.now() - datetime.timedelta(hours=8), datetime.datetime.now(), "wasser")
+    print(datetime.datetime.now() - datetime.timedelta(hours=2))
+    print(datetime.datetime.now())

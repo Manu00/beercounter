@@ -19,11 +19,11 @@ class db:
             cursor.execute(sql)
             connection.commit()
     
-    def close_db(self):
+    def closeDb(self):
         connection.commit()
         connection.close()
     
-    def store_item(self, time, name, id):
+    def storeItem(self, time, name, id):
         #sql = "INSERT INTO items VALUES(" + "'" + time + "', " + "'" + name + "', " + "'" + id + "')"
         #sql = "INSERT INTO items VALUES({time}, {name}, {id})"
         cursor.execute("INSERT INTO items VALUES(?,?,?)", (str(time), str(name), str(id)))
@@ -34,13 +34,18 @@ class db:
         connection.commit()
 
     
-    def get_item(self):
+    def getItemOLD(self):
         sql = "SELECT * FROM items"
         cursor.execute(sql)
         for dsatz in cursor:
             print(dsatz[0], dsatz[1])
     
-    def get_distinct(self):
+    def getItem(self, startTime, endTime, item):
+        cursor.execute("SELECT time FROM items WHERE strftime('%Y-%m-%d %H:%M:%S.%f', time) BETWEEN ? AND ? AND name = ?", (str(startTime), str(endTime), str(item)))
+        print(cursor.fetchall())
+        
+    
+    def getDistinct(self):
         sql = "SELECT DISTINCT name FROM items"
         cursor.execute(sql)
         return cursor.fetchall()

@@ -11,9 +11,6 @@
 </head>
 
 <body>
-    <h2>
-        Beercounter
-    </h2>
     <div>
         <canvas id="myChart"></canvas>
     </div>
@@ -24,8 +21,9 @@
             <input type="submit" value="4h" name="4h" />
             <input type="submit" value="8h" name="8h" />
         </form>
-        <form>
+        <form action="/" method="POST">
             {% for item in items %}
+            <!--add checked if needed-->
             <input type="checkbox" id="{{ item }}" name="{{ item }}" value="{{ item }}">
             <label for="{{ item }}">{{ item }}</label><br>
             {% endfor %}
@@ -35,28 +33,25 @@
     </div>
 </body>
 <script>
-    var xValues = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150];
-    var yValues = [7, 8, 8, 9, 9, 9, 10, 11, 14, 14, 15];
+    window.onload = function () {
+        var xValues = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150];
+        var yValues = [7, 8, 8, 9, 9, 9, 10, 11, 14, 14, 15];
 
-    new Chart("myChart", {
-        type: "line",
-        data: {
-            labels: xValues,
-            datasets: [{
-                pointRadius: 4,
-                backgroundColor: "rgba(0,0,0,1.0)",
-                borderColor: "rgba(0,0,0,0.1)",
-                data: yValues
-            }]
-        },
-        options: {}
-    });
-    // === include 'setup' then 'config' above ===
-
-    var myChart = new Chart(
-        document.getElementById('myChart'),
-        config
-    );
+        var ctx = document.getElementById("myChart");
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: yValues,
+                datasets: [{
+                    data: xValues
+                }]
+            },
+            label: "Afrika",
+            borderColor: "#3e95cd",
+            fill: false
+        });
+        chart.render();
+    }
 </script>
 
 </html>
