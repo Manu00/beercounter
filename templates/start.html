@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Beercounter</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="box" id="wrapperBox">
+      <h2>New Event</h2>
+      <div class="box" id="listBox">
+        <div id="item-list">
+          <h4>Items:</h4>
+          <div id="item-list"></div>
+
+          <h4>Add item</h4>
+          <form id="list-add">
+            <input type="text" id="list-item" placeholder="New Item" required value="Helles" />
+            <input type="submit" id="list-add-btn" value="Add Item" />
+          </form>
+        </div>
+      </div>
+      <div class="box" id="NameBox">
+        <h3>Additional Settings</h3>
+          <form id="eventForm">
+          <label for="eventName">Set a name for the event:</label><br>
+          <input type="text" id="eventName">
+          <button type="submit">Go</button>
+          <input type="submit" id="eventStart" value="submit">
+        </form>
+      </div>
+    </div>  
+</body>
+<script>
+var itemList = {
+  // (A) INITIALIZE
+  items : [], // current list
+  hlist : null, // HTML list
+  hadd : null, // HTML add item form
+  hitem : null, // HTML add item input field
+  init : function () {
+    // (A1) GET HTML ELEMENTS
+    itemList.hlist = document.getElementById("item-list");
+    itemList.hadd = document.getElementById("list-add");
+    itemList.hitem = document.getElementById("list-item");
+    itemList.hadd.addEventListener("submit", itemList.add);
+
+    // (A2) RESTORE PREVIOUS LIST
+    if (localStorage.items == undefined) { localStorage.items = "[]"; }
+    itemList.items = JSON.parse(localStorage.items);
+
+    // (A3) DRAW HTML LIST
+    itemList.draw();
+  },
+
+  // (B) ADD NEW ITEM TO THE LIST
+  add : function (evt) {
+    // (B1) PREVENT FORM SUBMIT
+    evt.preventDefault();
+
+    // (B2) ADD NEW ITEM TO LIST
+    itemList.items.push({
+      name : itemList.hitem.value, // Item name
+    });
+    itemList.hitem.value = "";
+    itemList.save();
+
+    // (B3) REDRAW HTML LIST
+    itemList.draw();
+  },
+
+  // (C) DRAW THE HTML LIST
+  draw : function () {
+    itemList.hlist.innerHTML = "";
+    if (itemList.items.length > 0) {
+      let row, name, delbtn, okbtn;
+      for (let i in itemList.items) {
+        // (C1) ITEM ROW
+        row = document.createElement("div");
+        row.className = "item-row";
+        itemList.hlist.appendChild(row);
+        
+        // (C2) ITEM NAME
+        name = document.createElement("div");
+        name.className = "item-name";
+        name.innerHTML = itemList.items[i].name;
+        row.appendChild(name);
+
+        // (C3) DELETE BUTTON
+        delbtn = document.createElement("input");
+        delbtn.className = "item-del";
+        delbtn.type = "button";
+        delbtn.value = "Delete";
+        delbtn.dataset.id = i;
+        delbtn.addEventListener("click", itemList.delete);
+        row.appendChild(delbtn);
+      }
+    }
+  },
+
+  // (D) SAVE SHOPPING LIST INTO LOCAL STORAGE
+  save : function () {
+    if (localStorage.items == undefined) { localStorage.items = "[]"; }
+    localStorage.items = JSON.stringify(itemList.items);
+  },
+
+  // (E) DELETE SELECTED ITEM
+  delete : function () {
+    if (confirm("Remove selected item?")) {
+      itemList.items.splice(this.dataset.id, 1); 
+      itemList.save();
+      itemList.draw();
+    }
+  },
+};
+
+window.addEventListener("DOMContentLoaded", itemList.init);
+</script>
+
+<script>
+  const handler = (e) => {
+    console.log("Button is clicked!");
+    for (let i = 0; i < itemList.items.length; i++) {
+      formData.append("item", itemList.items[i]);
+    }
+    //get name of event from form
+    formData.append("eventName", "test");
+
+    alert(formData);
+    console.log(formData);
+};
+
+const btn = document.querySelector("#eventStart");
+btn.addEventListener("click", handler);
+
+
+
+
+function processForm(e) {
+    if (e.preventDefault) e.preventDefault();
+
+    /* do what you want with the form */
+    var data = new FormData();
+
+    for (let i = 0; i < itemList.items.length; i++) {
+      data.append("item", itemList.items[i].name);
+      console.log(itemList.items[i].name);
+    }
+    //get name of event from form
+    data.append("eventName", document.getElementById("eventName").value);
+
+    console.log(data.get("eventName"));
+    // You must return false to prevent the default form behavior
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/test");
+    //xhr.onload = function () { alert(this.response); };
+    xhr.send(data);
+  return false;
+}
+
+var form = document.getElementById("eventForm");
+if (form.attachEvent) {
+    form.attachEvent("submit", processForm);
+} else {
+    form.addEventListener("submit", processForm);
+}
+</script>
+</html>

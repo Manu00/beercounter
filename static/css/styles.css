@@ -2,3 +2,73 @@ canvas {
     height: 90vh;
     width: 98vw;
 }
+html {
+    background-image: linear-gradient( to right, #c967fe, #ffa375);
+    font-family: 'Zen Kaku Gothic Antique', sans-serif;
+}
+
+.box {
+    background-color: #FFFFFF80;
+    border-radius: 20px;
+    padding: 2%;
+    row-gap: 10px;
+    column-gap: 10px;
+    flex-wrap: wrap;
+}
+
+#wrapperBox {
+    display: flex;
+    align-content: flex-start;
+}
+
+#nameBox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+/*everything with list*/
+#item-list, #list-add {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .item-row, .item-name, .item-del, .item-ok, #list-item, #list-add-btn {
+    box-sizing: border-box; 
+    border: 0;
+  }
+
+  .item-name, #list-item {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-right: 10px;
+    border-bottom: 3px solid #000;
+  }
+  .item-del, #list-add-btn {
+    cursor: pointer;
+    color: rgb(57, 0, 150);
+  }
+
+  /* (B) SHOPPING LIST */
+.item-row {
+    display: flex;
+    width: 100%;
+    margin: 5px 0;
+  }
+
+.item-del {
+    margin: 5px;
+    border-radius: 5px;
+    background: #de1919;
+}
+  
+  /* (C) ADD ITEM */
+#list-item {
+    width: 75%;
+    
+}
+
+#list-add-btn {
+    width: 25%;
+    background: #5a75d6;
+}
