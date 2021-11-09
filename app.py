@@ -142,9 +142,65 @@ class Store_api(Resource):
             else:
                 return jsonify({"message": "error cannot store data", "code": ""})
 
+class Neu(Resource):
+    def get(self):
+        jsonData = {
+                "events": [],
+            }
+        for event in events:
+            if event.isPublic:
+                tempData = {"event_id": "", "items": []}
+                itemsInEvent = event.getDistinct(event.getId())
+                tempData["event_id"] = event.getId()
+                tempData["items"] = itemsInEvent.get("items")
+                jsonData["events"].append(tempData)
+  
+        return jsonify(jsonData)
+
+    def post(self):
+        eventName = request.json.get("eventName")
+        items = request.json.get("items")
+        newEvent = event.Event(eventName, True)
+        events.append(newEvent)
+
+class Neu2(Resource):
+    def post(self, event_id):
+        event_id = request.json.get("event_id")
+        timescale = int(request.json.get("timescale"))
+        items = request.json.get("items")
+        print(event_id)
+        for event in events:
+            if event.getId() == event_id:
+                if items:
+                    print("requesting items:")
+                    print(items)
+                    result = event.getData(timescale, items)
+                    #result = event.getData(timescale, {"wasser": "wasser", "weizen": "weizen"})
+                    print(result)
+                    return jsonify(result)
+                else:
+                    tempData = {"event_id": event.getId(), "items": []}
+                    tempData["items"] = event.getDistinct(event.getId()).get("items")
+                    return jsonify(tempData)
+            else:
+                return jsonify({"message": "error no event with this id", "code": ""})
+        return jsonify({"message": "error no event_id specified", "code": "001"})
+
+    def put(self, event_id):
+        event_id = request.json.get("event_id")
+        item = request.json.get("name")
+        #database.storeItem(datetime.datetime.now(), item, uuid.uuid4())
+        for event in events:
+            if event.getId() == event_id:
+                event.storeData(datetime.datetime.now(), item, uuid.uuid4())
+                return jsonify({"message": "ok", "code": "200"})
+            else:
+                return jsonify({"message": "error cannot store data", "code": ""})
 
 api.add_resource(Get_api, "/api/get")
 api.add_resource(Store_api, "/api/store")
+api.add_resource(Neu, "/api/")
+api.add_resource(Neu2, "/api/<str:event_id>")
 
 def tests():
     #database.storeItem(datetime.time, "Bier", 1)
