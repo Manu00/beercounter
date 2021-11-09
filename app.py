@@ -1,5 +1,6 @@
 from logging import PlaceHolder, shutdown
-from flask import Flask, redirect, url_for, request, render_template
+from flask import Flask, redirect, url_for, request, render_template, jsonify, request
+from flask_restful import Api, Resource, reqparse, abort
 import datetime
 import os
 import sys
@@ -7,48 +8,26 @@ import uuid
 import db
 import event
 import json
+"""
+Api docs
+/api/ => POST {eventName: "", items: []}
+/api/ => GET (get public events)
+/api/<event_id> POST {event_id: "", timescale: "", items: {}} /not final
+/api/<event_id> PUT {event_id: "", name: ""} /not final
+"""
 
 app = Flask(__name__)
+api = Api(app)
 
 #global sht
 result = 0
 database = db.db()
 events = []
 
-'''
-@app.route("/", methods=["POST", "GET"])
-def index():
-    #this is a test
-    print("loading old events")
-    loadEvents()
-    print(events)
-    listOfItems = database.getDistinct("74068922ee0a4fb2873b1607bfc48667")
-    items = []
-    checked = []
-    for item in listOfItems:
-        items.append(item[0])
-    #tests()
-    data = ""
-    if request.method == "GET":
-        return render_template("index.html", checked=checked, items=items, data = data)
-    if request.method == "POST":
-        form_data = request.form
-        if form_data == "1h":
-            pass
-        elif form_data == "2h":
-            pass
-        elif form_data == "4h":
-            pass
-        elif form_data == "8h":
-            pass
-        else:
-            for i in form_data.values():
-                checked.append(i)
-        #form_data = database.get_distinct()
-        print(form_data)
-        print(checked)
-        return render_template("index.html", checked=checked, items=items, data = data)
-'''
+@app.before_first_request
+def setup():
+    pass
+    #loadEvents()
 
 @app.route("/", methods=["POST", "GET"])
 def test():
@@ -62,112 +41,116 @@ def test():
         print(form_data)
 
         #create new event and add it to the list
-        newEvent = event.event(form_data.get("eventName"), True)
+        newEvent = event.Event(form_data.get("eventName"), True)
         events.append(newEvent)
         print(events)
         return render_template("start.html")
     pass
 
 
-@app.route("/event/<event_id>", methods=["POST", "GET"])
-def hello_user(event_id):
+@app.route("/event/<event_id>", methods=["GET"])
+def event_route(event_id):
     for event in events:
         if event.getId() == event_id:
             #event.getData()
-            print("found this in db: ")
-            print(event.getData(48, {"wasser": "wasser", "weizen": "weizen"}))
+            #print("found this in db: ")
+            #print(event.getData(48, {"wasser": "wasser", "weizen": "weizen"}))
             
-            pass
+            #pass
             #this is a test
+            return render_template("event.html")
 
             if request.method == "GET":
                 return render_template("event.html")
             if request.method == "POST":
-                formData = request.form
-                result = processRequest(event.getId(), formData)
+                #formData = request.form
+                #result = processRequest(event.getId(), formData)
                 
                 return render_template("event.html")
         else:
             return render_template("error.html")
 
-@app.route("/api/<action>", methods=["POST", "GET"])
-def api(action):
-    if action == "post":
-        if request.method == "POST":
-            event_id = request.json.get("event_id")
-            item = request.json.get("name")
-            #database.storeItem(datetime.datetime.now(), item, uuid.uuid4())
-            for event in events:
-                if event.getId() == event_id:
-                    event.storeData(datetime.datetime.now(), item, uuid.uuid4())
-                    return "ok"
-                else:
-                    return "error no event with this id"
-            #print(item)
-            #return "ok"
-    #get data from requested event
-    if action == "get":
-        if request.method == "POST":
-            event_id = request.json.get("event_id")
-            timescale = int(request.json.get("timescale"))
-            items = request.json.get("items")
-            print(items)
-            for event in events:
-                if event.getId() == event_id:
-                    result = event.getData(timescale, {"wasser": "wasser", "weizen": "weizen"})
-                    print(result)
-                    return result
-                else:
-                    return "error no event with this id"
-    #get all public events
-    if action == "get-public":
-        if request.method == "GET":
-            jsonData = {
-                "events": [
-
-                ]
-            }
-            for event in events:
-                if event.isPublic:
-                    jsonData["events"].append({"event_id": event.getId()})
-            result = json.dumps(jsonData, indent = 4)
-        return result
-    else:
-        return "something is very wrong"
-
-#is not needed anymore
-def getData(timescale, items):
-    jsonData = {
-      "items": [
-
-      ]
-    }
-    startTime = datetime.datetime.now() - datetime.timedelta(0, 0, 0, 0, 0, timescale, 0)
-    endTime = datetime.datetime.now()
-    for item in items.keys():
-        jsonData["items"].append({"name": item, "size": database.getItemcount(item), "timestamps": database.getItem(startTime, endTime, item)})
-    result = json.dumps(jsonData, indent = 4)
-    return result
-
+#todo check to not load same event multiple times
+#"""Loads events from database at the program startup"""
 def loadEvents():
     dbConn = db.db()
     oldEvents = dbConn.getEventIds()
 
     for oldEvent in oldEvents:
         oldEventName = dbConn.getEventName(oldEvent[0])
-        toAdd = event.event(oldEventName[0], False)
+        toAdd = event.Event(oldEventName[0], False)
         toAdd.setId(oldEvent[0])
         events.append(toAdd)
+        print(toAdd.getId())
     dbConn.closeDb()
 
-#TODOO
-def processRequest(event_id, formData):
-    pass
+class Get_api(Resource):
+  
+    # corresponds to the GET request.
+    def get(self):
+        jsonData = {
+                "events": [],
+            }
+        for event in events:
+            if event.isPublic:
+                tempData = {"event_id": "", "items": []}
+                itemsInEvent = event.getDistinct(event.getId())
+                tempData["event_id"] = event.getId()
+                tempData["items"] = itemsInEvent.get("items")
+                jsonData["events"].append(tempData)
+  
+        return jsonify(jsonData)
+  
+    # Corresponds to POST request
+    def post(self):
+        event_id = request.json.get("event_id")
+        timescale = int(request.json.get("timescale"))
+        items = request.json.get("items")
+        print(event_id)
+        for event in events:
+            if event.getId() == event_id:
+                if items:
+                    print("requesting items:")
+                    print(items)
+                    result = event.getData(timescale, items)
+                    #result = event.getData(timescale, {"wasser": "wasser", "weizen": "weizen"})
+                    print(result)
+                    return jsonify(result)
+                else:
+                    tempData = {"event_id": event.getId(), "items": []}
+                    tempData["items"] = event.getDistinct(event.getId()).get("items")
+                    return jsonify(tempData)
+            else:
+                return jsonify({"message": "error no event with this id", "code": ""})
+        return jsonify({"message": "error no event_id specified", "code": "001"})
+
+class Store_api(Resource):
+  
+    # corresponds to the GET request.
+    def get(self):
+        pass
+  
+    # Corresponds to POST request
+    def post(self):
+        event_id = request.json.get("event_id")
+        item = request.json.get("name")
+        #database.storeItem(datetime.datetime.now(), item, uuid.uuid4())
+        for event in events:
+            if event.getId() == event_id:
+                event.storeData(datetime.datetime.now(), item, uuid.uuid4())
+                return jsonify({"message": "ok", "code": "200"})
+            else:
+                return jsonify({"message": "error cannot store data", "code": ""})
 
 
+api.add_resource(Get_api, "/api/get")
+api.add_resource(Store_api, "/api/store")
 
 def tests():
     #database.storeItem(datetime.time, "Bier", 1)
-    getData(48, {"wasser": "wasser", "weizen": "weizen"})
+    #getData(48, {"wasser": "wasser", "weizen": "weizen"})
     #database.getItem(datetime.datetime.now() - datetime.timedelta(hours=24), datetime.datetime.now(), "wasser")
     testEvent = event.event()
+
+if __name__ == "__app__":
+	app.run(debug=True, host='0.0.0.0', port=5050)

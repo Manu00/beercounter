@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Beercounter</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/styles.css') }}">
+    <script src="{{ url_for('static', filename = 'js/event.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"></script>
+    <script></script>
+</head>
+
+<body>
+    <div class="box" id="wrapperBox">
+        <div class="box" id="graph">
+
+        </div>
+        <div class="box" id="control">
+            <form>
+                <p>Timescale</p>
+                <input type="radio" id="1h" name="timescale" value="1h">
+                <label for="1h">1h</label>
+                <input type="radio" id="2h" name="timescale" value="2h">
+                <label for="2h">2h</label>
+                <input type="radio" id="4h" name="timescale" value="4h">
+                <label for="4h">4h</label>
+                <input type="radio" id="8h" name="timescale" value="8h">
+                <label for="8h">8h</label>
+            </form>
+            <form id="itemSelection">
+                <p>Items:</p>
+                
+            </form>
+        </div>
+    </div>
+</body>
+<!--<script>
+    const baseUrl = window.location.origin;
+    const event_id = window.location.pathname.split("/")[2];
+    let timescale = 1;
+    let items = {};
+    let graphData = {};
+    //getItems();
+    addTimeHandler();
+
+    function init() {
+        addTimeHandler();
+        
+    }
+
+    function addTimeHandler() {
+    document.getElementById("1h").addEventListener('click', (e)=>{timescale = 1});
+    document.getElementById("2h").addEventListener('click', (e)=>{timescale = 2});
+    document.getElementById("4h").addEventListener('click', (e)=>{timescale = 4});
+    document.getElementById("8h").addEventListener('click', (e)=>{timescale = 8});
+    }
+
+    /***document.getElementById("1h").onclick = function() {
+        timescale = 1;
+        getData();
+    };
+    document.getElementById("2h").onclick = function() {
+        timescale = 2;
+        getData();
+    };
+    document.getElementById("4h").onclick = function() {
+        timescale = 4;
+        getData();
+    };
+    document.getElementById("8h").onclick = function() {
+        timescale = 8;
+        getData();
+    };***/
+
+    function getItems() {
+        let xhr = new XMLHttpRequest();
+        let url = host + "/api/get";
+
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+  
+                // Print received data from server
+                //result.innerHTML = this.responseText;
+                console.log(xhr.status);
+                console.log("get items response:")
+                console.log(this.responseText);
+                let obj = JSON.parse(this.responseText);
+                items = obj.items;
+                console.log("new item list: " + items);
+                //drawItemSelection();
+                //graphData = this.responseText;
+  
+            }
+        };
+        
+        let data = {event_id: "", timescale: "0", items: []};
+        data["event_id"] = event_id;
+        console.log("sending data: ", data);
+        xhr.send(JSON.stringify(data));
+    }
+
+    function getData() {
+        let xhr = new XMLHttpRequest();
+        let url = host + "/api/get";
+
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+  
+                // Print received data from server
+                //result.innerHTML = this.responseText;
+                console.log(xhr.status);
+                console.log("get data response:")
+                console.log(this.responseText);
+                graphData = this.responseText;
+                let test = document.getElementById("graph");
+                test.innerHTML = graphData;
+  
+            }
+        };
+        
+        let data = {event_id: "", timescale: "", items: {}};
+        data["event_id"] = event_id;
+        data["timescale"] = timescale;
+        const values = Object.values(items);
+        values.forEach(item => {
+            data.items.item = item;
+            console.log(item);
+        });
+        console.log(data);
+        xhr.send(JSON.stringify(data));
+    }
+
+    function drawItemSelection() {
+        const itemSelectionForm = document.getElementById("itemSelection");
+
+        const values = Object.values(items);
+        values.forEach(item => {
+            const input = document.createElement("input");
+            input.innerHTML = item;
+            input.id = item;
+            input.type = "checkbox";
+            
+            const label = document.createElement("label");
+            label.innerHTML = item;
+            label.htmlFor = item;
+
+            itemSelectionForm.appendChild(input);
+            itemSelectionForm.appendChild(label);
+            console.log("added checkbox for item: " + item);
+        });
+    }
+</script>-->
+</html>

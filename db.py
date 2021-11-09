@@ -3,7 +3,7 @@ from sqlite3.dbapi2 import Connection
 import sys
 import sqlite3
 
-from event import event
+from event import Event
 
 
 class db:
@@ -14,7 +14,7 @@ class db:
     # check for existing database, create one if necessary
     def __init__(self):
         if os.path.exists("beercounter.db"):
-            print("using existing database")
+            #print("using existing database")
             self.connection = sqlite3.connect("beercounter.db", check_same_thread=False)
             self.cursor = self.connection.cursor()
         else:
@@ -56,10 +56,10 @@ class db:
     def getItemcount(self, event_id, item):
         self.cursor.execute("SELECT count(*) FROM items WHERE name = ? AND name = ? AND event_id = ?", (str(item), str(item), str(event_id)))
         temp = self.cursor.fetchall()
-        print("database has ")
-        print(temp[0][0])
-        print(" of item")
-        print(item)
+        #print("database has ")
+        #print(temp[0][0])
+        #print(" of item")
+        #print(item)
         return(int(temp[0][0]))
 
     def getDistinct(self, event_id):

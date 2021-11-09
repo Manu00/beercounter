@@ -1,47 +1,4 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>Beercounter</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="{{ url_for('static', filename = 'js/start.js') }}"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename = 'css/styles.css') }}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique&display=swap" rel="stylesheet">
-</head>
-
-<body>
-  <div class="box" id="wrapperBox">
-    <h2>New Event</h2>
-    <div class="box" id="listBox">
-      <h4>Items:</h4>
-      <div id="item-list"></div>
-
-      <h4>Add item</h4>
-      <form id="list-add">
-        <input type="text" id="list-item" placeholder="New Item" required value="Helles" />
-        <input type="submit" id="list-add-btn" value="Add Item" />
-      </form>
-    </div>
-    <div class="box" id="nameBox">
-      <h3>Additional Settings</h3>
-      <form id="eventForm">
-        <label for="eventName">Set a name for the event:</label><br>
-        <input type="text" id="eventName">
-        <button type="submit">Go</button>
-        <input type="submit" id="eventStart" value="submit">
-      </form>
-    </div>
-    <div class="box" id="eventsBox">
-      <h3>Events:</h3>
-        <!--here shal be public events with a direct link-->
-    </div>
-  </div>
-</body>
-<!--<script>
-  var itemList = {
+var itemList = {
     // (A) INITIALIZE
     items: [], // current list
     hlist: null, // HTML list
@@ -63,7 +20,6 @@
 
       // (A3) DRAW HTML LIST
       itemList.draw();
-      console.log("init ran")
     },
 
     // (B) ADD NEW ITEM TO THE LIST
@@ -124,62 +80,62 @@
     delete: function () {
       if (confirm("Remove selected item?")) {
         itemList.items.splice(this.dataset.id, 1);
-        itemList.save();
+        //itemList.save();
         itemList.draw();
       }
     },
   };
 
-  window.addEventListener("DOMContentLoaded", itemList.init);
-</script>
+function makeEvent() {
+    let xhr = new XMLHttpRequest();
+        let fullUrl = window.location.origin + "/api/";
 
-<script>
-  /***const handler = (e) => {
-    console.log("Button is clicked!");
-    for (let i = 0; i < itemList.items.length; i++) {
-      formData.append("item", itemList.items[i]);
-    }
-    //get name of event from form
-    formData.append("eventName", "test");
+        xhr.open("POST", fullUrl, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
 
-    alert(formData);
-    console.log(formData);
-  };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                let response = JSON.parse(this.responseText);
+                //items = response.items;
+                console.log(response);
+            }
+        };
+        
+        let data = {eventName: document.getElementById("eventName").value, items: []};
+        items.forEach(item => {
+            data.append("item", item.name);
+        });
+        xhr.send(JSON.stringify(data));
+        return false;
+}
 
-  const btn = document.querySelector("#eventStart");
-  btn.addEventListener("click", handler);***/
-
-
-
-
-  function processForm(e) {
+function processForm(e) {
     if (e.preventDefault) e.preventDefault();
 
     /* do what you want with the form */
-    var data = new FormData();
+    //items = itemList.getItems();
+    console.log("processing get data: ", items);
+    let data = new FormData();
 
-    for (let i = 0; i < itemList.items.length; i++) {
-      data.append("item", itemList.items[i].name);
-      console.log(itemList.items[i].name);
+    for (let i = 0; i < items.length; i++) {
+      data.append("item", items[i].name);
+      console.log(items[i].name);
     }
     //get name of event from form
     data.append("eventName", document.getElementById("eventName").value);
 
     console.log(data.get("eventName"));
     // You must return false to prevent the default form behavior
-    var xhr = new XMLHttpRequest();
+    let xhr = new XMLHttpRequest();
     xhr.open("POST", window.location.origin + "/");
-    //xhr.onload = function () { alert(this.response); };
+    xhr.onload = function () { alert(this.response); };
     xhr.send(data);
     return false;
   }
 
-  var form = document.getElementById("eventForm");
-  if (form.attachEvent) {
-    form.attachEvent("submit", processForm);
-  } else {
-    form.addEventListener("submit", processForm);
+  function init() {
+      document.getElementById("eventForm").addEventListener("submit", makeEvent);
+      itemList.init();
   }
-</script>-->
-
-</html>
+  
+  window.addEventListener("DOMContentLoaded", init);

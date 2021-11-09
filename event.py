@@ -3,7 +3,7 @@ import json
 import uuid
 import db
 
-class event:
+class Event:
 
     #Global Attributes
     event_id = ""
@@ -50,7 +50,7 @@ class event:
         self.isPublic = visible
 
     def getData(self, timescale, items):
-        test = {
+        data = {
             "event_id": self.event_id,
             "items": [
 
@@ -59,12 +59,26 @@ class event:
         startTime = datetime.datetime.now() - datetime.timedelta(0, 0, 0, 0, 0, timescale, 0)
         endTime = datetime.datetime.now()
         #change to items.values
-        for item in items.keys():
-            test["items"].append({"name": item, "size": self.database.getItemcount(self.event_id, item), "timestamps": self.database.getItem(self.event_id, startTime, endTime, item)})
-        result = json.dumps(test, indent = 4)
+        for item in items.values():
+            data["items"].append({"name": item, "size": self.database.getItemcount(self.event_id, item), "timestamps": self.database.getItem(self.event_id, startTime, endTime, item)})
+        #result = json.dumps(data, indent = 4)
         print("getData() resonese:")
-        print(result)
-        return result
+        print(data)
+        return data
 
+    #Todo add check and return true if successful
     def storeData(self, time, name, id):
         self.database.storeItem(self.event_id, time, name, id)
+    
+    def getDistinct(self, event_id):
+        data = {
+            "event_id": self.event_id,
+            "items": [
+
+            ]
+        }
+        itemsInDb = self.database.getDistinct(event_id)
+        for item in itemsInDb:
+            data["items"].append(item[0])
+        return data
+        
